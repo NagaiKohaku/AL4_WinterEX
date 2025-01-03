@@ -10,6 +10,8 @@ void WorldTransform::Initialize() {
 	rotate_ = { 0.0f,0.0f,0.0f };
 	scale_ = { 1.0f,1.0f,1.0f };
 
+	velocity_ = { 0.0f,0.0f,0.0f };
+
 	offset_ = { 0.0f,0.0f,0.0f };
 
 	UpdateMatrix();
@@ -17,12 +19,16 @@ void WorldTransform::Initialize() {
 
 void WorldTransform::UpdateMatrix() {
 
+	translate_ += velocity_;
+
 	worldMatrix_ = MakeAffineMatrix(scale_, rotate_, translate_ + offset_);
 
 	if (parent_) {
 
 		worldMatrix_ *= parent_->GetWorldMatrix();
 	}
+
+	velocity_ = { 0.0f,0.0f,0.0f };
 }
 
 void WorldTransform::DisplayImGui() {

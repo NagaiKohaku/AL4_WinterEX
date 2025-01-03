@@ -75,6 +75,12 @@ public:
 	void SetScale(const Vector3& vector) { scale_ = vector; }
 
 	/// <summary>
+	/// 移動量のセッター
+	/// </summary>
+	/// <param name="vector">移動慮</param>
+	void SetVelocity(const Vector3& vector) { velocity_ = vector; }
+
+	/// <summary>
 	/// ワールド行列のセッター
 	/// </summary>
 	/// <param name="matrix">ワールド行列</param>
@@ -98,6 +104,12 @@ public:
 	/// <param name="parent"></param>
 	void SetParent(const WorldTransform* parent);
 
+	/// <summary>
+	/// 移動量の加算
+	/// </summary>
+	/// <param name="vector">移動量</param>
+	void AddVelocity(const Vector3& vector) { velocity_ += vector; }
+
 private:
 
 	//座標
@@ -108,6 +120,9 @@ private:
 
 	//大きさ
 	Vector3 scale_;
+
+	//移動量
+	Vector3 velocity_;
 
 	//ワールド行列
 	Matrix4x4 worldMatrix_;

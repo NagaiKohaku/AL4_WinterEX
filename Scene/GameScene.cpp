@@ -21,7 +21,7 @@ void GameScene::Initialize() {
 	camera_->SetDebugCameraFlag(true);
 
 	//カメラの座標
-	camera_->GetWorldTransform().SetTranslate({ 0.0f,3.0f,0.0f });
+	camera_->GetWorldTransform().SetTranslate({ 0.0f,0.0f,-5.0f });
 
 	//デフォルトカメラを設定
 	Object3DCommon::GetInstance()->SetDefaultCamera(camera_.get());
@@ -30,70 +30,32 @@ void GameScene::Initialize() {
 
 	/// === リソースの読み込み === ///
 
-	//スプライトのロード
-	SpriteManager::GetInstance()->LoadSprite("Title", "RockShotTitle");
-
-	//モデルのロード
-	ModelManager::GetInstance()->LoadModel("Ground", "terrain");
-
-	//音声データの読み込み
-	soundData_ = Audio::GetInstance()->SoundLoad("Resource/Sound/SE/se.wav");
+	SpriteManager::GetInstance()->LoadSprite("Sprite","RockShotTitle");
 
 	/// === オブジェクトの生成 === ///
 
-	/// === タイトルの生成 === ///
+	/// === バレットマネージャーの生成 === ///
 
-	/// === 箱の生成 === ///
+	bulletManager_ = std::make_unique<BulletManager>();
 
-	//箱の生成
-	cube_ = std::make_unique<Object3D>();
+	/// === プレイヤーの生成 === ///
 
-	//座標の設定
-	cube_->GetWorldTransform().SetTranslate({ 0.0f,1.0f,0.0f });
+	player_ = std::make_unique<Player>();
 
-	//モデルの設定
-	cube_->SetModel("Cube");
+	player_->SetModel("Sphere");
 
-	//モデルの色を指定
-	cube_->GetModel()->SetColor({ 0.5f,0.0f,0.0f,1.0f });
+	player_->SetBulletManager(bulletManager_.get());
 
-	/// === 球の生成 === ///
+	player_->GetWorldTransform().SetTranslate({ 0.0f,0.0f,0.0f });
 
-	//球の生成
-	ball_ = std::make_unique<Object3D>();
+	/// === エネミーの生成 === ///
 
-	//座標の設定
-	ball_->GetWorldTransform().SetTranslate({ 0.0f,3.0f,0.0f });
+	enemy_ = std::make_unique<Enemy>();
 
-	//角度の設定
-	ball_->GetWorldTransform().SetRotate({ 0.0f,static_cast<float>(std::numbers::pi) / 180.0f * -90.0f,0.0f });
+	enemy_->SetModel("Sphere");
 
-	//モデルの設定
-	ball_->SetModel("Sphere");
+	enemy_->GetWorldTransform().SetTranslate({ -1.0f,-1.0f,50.0f });
 
-	//モデルの色の指定
-	ball_->GetModel()->SetColor({ 0.5f,0.f,0.0f,1.0f });
-
-	camera_->SetTrackingObject(ball_.get());
-
-	/// === 地面の生成 === ///
-
-	//地面の生成
-	ground_ = std::make_unique<Object3D>();
-
-	//角度の設定
-	ground_->GetWorldTransform().SetRotate({ 0.0f,static_cast<float>(std::numbers::pi) / 180.0f * -90.0f,0.0f });
-
-	//モデルの設定
-	ground_->SetModel("Ground");
-
-	/// === SEの生成 === ///
-
-	soundObject_ = Audio::GetInstance()->CreateSoundObject(soundData_, false);
-
-	ParticleManager::GetInstance()->CreateParticleGroup("Particle", "star.png");
-
-	ParticleManager::GetInstance()->SetAcceleration("Particle", Vector3(0.0f, 5.0f, 0.0f), AABB({ -1.0f,-1.0f,-1.0f }, { 1.0f,1.0f,1.0f }));
 }
 
 void GameScene::Finalize() {
@@ -108,38 +70,19 @@ void GameScene::Update() {
 	camera_->Update();
 
 	//3Dオブジェクトの更新
-	cube_->Update();
+	player_->Update();
 
-	ball_->Update();
+	enemy_->Update();
 
-	ground_->Update();
-
-	ParticleManager::GetInstance()->Emit(
-		"Particle",
-		Vector3(0.0f, 0.0f, 0.0f),
-		AABB({ -1.0f,0.0f,-1.0f }, { 1.0f,0.0f,1.0f }),
-		Vector3(-1.0f, -2.0f, -1.0f),
-		Vector3(1.0f, -1.0f, 1.0f),
-		1.0f,
-		3.0f,
-		true,
-		2
-	);
+	bulletManager_->Update();
 
 	//ImGuiを起動
 	ImGui::Begin("Scene");
 
 	//モデルのImGui
-	if (ImGui::TreeNode("Cube")) {
+	if (ImGui::TreeNode("Player")) {
 
-		cube_->DisplayImGui();
-
-		ImGui::TreePop();
-	}
-
-	if (ImGui::TreeNode("Ball")) {
-
-		ball_->DisplayImGui();
+		player_->DisplayImGui();
 
 		ImGui::TreePop();
 	}
@@ -149,12 +92,6 @@ void GameScene::Update() {
 		camera_->DisplayImGui();
 
 		ImGui::TreePop();
-	}
-
-	if (ImGui::Button("Start Audio")) {
-
-		//音声データの再生
-		Audio::GetInstance()->StartSound(soundObject_);
 	}
 
 	ImGui::Text("Shift + LeftClick : Move Camera");
@@ -181,12 +118,12 @@ void GameScene::Draw() {
 	//3DObjectの描画準備
 	Object3DCommon::GetInstance()->CommonDrawSetting();
 
-	////Object3Dの描画
-	cube_->Draw();
+	//Object3Dの描画
+	player_->Draw();
 
-	ball_->Draw();
+	enemy_->Draw();
 
-	ground_->Draw();
+	bulletManager_->Draw();
 
 	/// === 前景Spriteの描画 === ///
 

@@ -6,6 +6,10 @@
 #include "Object2D.h"
 #include "Audio.h"
 
+#include "Player.h"
+#include "Enemy.h"
+#include "BulletManager.h"
+
 #include "memory"
 
 class GameScene : public BaseScene {
@@ -40,14 +44,14 @@ private:
 	//音声データ
 	SoundData soundData_;
 
-	//箱
-	std::unique_ptr<Object3D> cube_;
+	//バレットマネージャー
+	std::unique_ptr<BulletManager> bulletManager_;
 
-	//球
-	std::unique_ptr<Object3D> ball_;
+	//プレイヤー
+	std::unique_ptr<Player> player_;
 
-	//地面
-	std::unique_ptr<Object3D> ground_;
+	//エネミー
+	std::unique_ptr<Enemy> enemy_;
 
 	//SE
 	SoundObject soundObject_;

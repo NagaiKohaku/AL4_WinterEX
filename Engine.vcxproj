@@ -59,7 +59,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)3d;$(ProjectDir)2d;$(ProjectDir)Math;$(ProjectDir)Base;$(ProjectDir)Scene;$(ProjectDir)Other;$(ProjectDir)Externals\DirectXTex;$(ProjectDir)Externals\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)3d;$(ProjectDir)2d;$(ProjectDir)Math;$(ProjectDir)Base;$(ProjectDir)Scene;$(ProjectDir)Other;$(ProjectDir)Character;$(ProjectDir)Externals\DirectXTex;$(ProjectDir)Externals\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -81,7 +81,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)3d;$(ProjectDir)2d;$(ProjectDir)Math;$(ProjectDir)Base;$(ProjectDir)Scene;$(ProjectDir)Other;$(ProjectDir)Externals\DirectXTex;$(ProjectDir)Externals\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)3d;$(ProjectDir)2d;$(ProjectDir)Math;$(ProjectDir)Base;$(ProjectDir)Scene;$(ProjectDir)Other;$(ProjectDir)Character;$(ProjectDir)Externals\DirectXTex;$(ProjectDir)Externals\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -115,6 +115,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2d\TextureManager.cpp" />
     <ClCompile Include="Base\WinApp.cpp" />
     <ClCompile Include="3d\DirectionalLight.cpp" />
+    <ClCompile Include="Character\Bullet.cpp" />
+    <ClCompile Include="Character\BulletManager.cpp" />
+    <ClCompile Include="Character\Enemy.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math\Easing.cpp" />
     <ClCompile Include="Math\MakeMatrixMath.cpp" />
@@ -128,6 +131,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="3d\PointLight.cpp" />
     <ClCompile Include="3d\ParticleCommon.cpp" />
     <ClCompile Include="3d\ParticleGroup.cpp" />
+    <ClCompile Include="Character\Player.cpp" />
     <ClCompile Include="Scene\BaseScene.cpp" />
     <ClCompile Include="Scene\GameScene.cpp" />
     <ClCompile Include="Scene\SceneManager.cpp" />
@@ -152,6 +156,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2d\TextureManager.h" />
     <ClInclude Include="Base\WinApp.h" />
     <ClInclude Include="3d\DirectionalLight.h" />
+    <ClInclude Include="Character\Bullet.h" />
+    <ClInclude Include="Character\BulletManager.h" />
+    <ClInclude Include="Character\Enemy.h" />
     <ClInclude Include="Math\AABB.h" />
     <ClInclude Include="Math\Easing.h" />
     <ClInclude Include="Math\MakeMatrixMath.h" />
@@ -165,6 +172,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="3d\PointLight.h" />
     <ClInclude Include="3d\ParticleCommon.h" />
     <ClInclude Include="3d\ParticleGroup.h" />
+    <ClInclude Include="Character\Player.h" />
     <ClInclude Include="Scene\BaseScene.h" />
     <ClInclude Include="Scene\GameScene.h" />
     <ClInclude Include="Scene\SceneManager.h" />
