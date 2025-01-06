@@ -7,8 +7,9 @@
 #include "Audio.h"
 
 #include "Player.h"
-#include "Enemy.h"
 #include "BulletManager.h"
+#include "EnemyManager.h"
+#include "ColliderManager.h"
 
 #include "memory"
 
@@ -47,11 +48,17 @@ private:
 	//バレットマネージャー
 	std::unique_ptr<BulletManager> bulletManager_;
 
+	//エネミーマネージャー
+	std::unique_ptr<EnemyManager> enemyManager_;
+
+	//コライダーマネージャー
+	std::unique_ptr<ColliderManager> colliderManager_;
+
 	//プレイヤー
 	std::unique_ptr<Player> player_;
 
-	//エネミー
-	std::unique_ptr<Enemy> enemy_;
+	//天球
+	std::unique_ptr<Object3D> skyDome_;
 
 	//SE
 	SoundObject soundObject_;

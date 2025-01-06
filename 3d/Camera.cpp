@@ -165,7 +165,7 @@ void Camera::Update() {
 			transform_.SetOffset(offset);
 
 			//カメラ座標を追従対象を中心にオフセット分ずらす
-			transform_.SetTranslate(object_->GetWorldTransform().GetTranslate());
+			transform_.SetTranslate(object_->GetWorldTransform()->GetTranslate());
 		}
 
 		/// === 行列の計算 === ///

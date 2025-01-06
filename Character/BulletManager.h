@@ -15,9 +15,11 @@ public:
 
 	void Draw();
 
-	void AddBullet(Vector3 pos);
+	void AddBullet(Vector3 pos, Vector3 targetPos);
 
 public:
+
+	std::list<CharacterBase*> GetList();
 
 private:
 

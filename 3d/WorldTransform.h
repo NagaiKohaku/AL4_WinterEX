@@ -57,6 +57,12 @@ public:
 	const Matrix4x4& GetWorldMatrix() const { return worldMatrix_; }
 
 	/// <summary>
+	/// 移動量のゲッター
+	/// </summary>
+	/// <returns>移動量</returns>
+	const Vector3& GetVelocity() const { return velocity_; }
+
+	/// <summary>
 	/// 座標のセッター
 	/// </summary>
 	/// <param name="vector">座標</param>
@@ -102,7 +108,7 @@ public:
 	/// 親オブジェクトのセッター
 	/// </summary>
 	/// <param name="parent"></param>
-	void SetParent(const WorldTransform* parent);
+	void SetParent(WorldTransform* parent);
 
 	/// <summary>
 	/// 移動量の加算

@@ -55,9 +55,9 @@ const Vector3& WorldTransform::GetWorldTranslate() const {
 	return result;
 }
 
-void WorldTransform::SetParent(const WorldTransform* parent) {
+void WorldTransform::SetParent(WorldTransform* parent) {
 
 	this->Initialize();
 
-	this->parent_ = parent_;
+	this->parent_ = parent;
 }

@@ -1,22 +1,14 @@
 #pragma once
 
-#include "CharacterBase.h"
+#include "Object3D.h"
+#include "Collider.h"
+
+#include "memory"
 
 ///=====================================================/// 
-/// エネミー
+/// キャラクター基底
 ///=====================================================///
-class Enemy : public CharacterBase {
-
-	///-------------------------------------------/// 
-	/// 構造体
-	///-------------------------------------------///
-private:
-
-	//状態
-	enum STATE {
-		Approach,
-		Leave
-	};
+class CharacterBase : public Object3D {
 
 	///-------------------------------------------/// 
 	/// メンバ関数
@@ -26,7 +18,7 @@ public:
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	Enemy();
+	CharacterBase();
 
 	/// <summary>
 	/// 更新
@@ -39,15 +31,10 @@ public:
 	void Draw() override;
 
 	/// <summary>
-	/// デバッグ情報の表示
-	/// </summary>
-	void DisplayImGui() override;
-
-	/// <summary>
 	/// 衝突時の処理
 	/// </summary>
 	/// <param name="character">衝突相手</param>
-	void OnCollision(CharacterBase* character) override;
+	virtual void OnCollision(CharacterBase* character) = 0;
 
 	///-------------------------------------------/// 
 	/// ゲッター・セッター
@@ -55,36 +42,16 @@ public:
 public:
 
 	/// <summary>
-	/// 死亡フラグのゲッター
+	/// コライダーのゲッター
 	/// </summary>
-	/// <returns>死亡フラグ</returns>
-	bool GetIsDead() { return isDead; }
-
-	///-------------------------------------------/// 
-	/// クラス内関数
-	///-------------------------------------------///
-private:
-
-	/// <summary>
-	/// 移動
-	/// </summary>
-	void Move();
+	/// <returns>コライダー</returns>
+	Collider* GetCollider() { return collider_.get(); }
 
 	///-------------------------------------------/// 
 	/// メンバ変数
 	///-------------------------------------------///
-private:
+protected:
 
-	//状態
-	STATE state_;
-
-	//移動速度
-	float speed_;
-
-	//離脱位置
-	float leavePosZ_;
-
-	//死亡フラグ
-	bool isDead;
-
+	//コライダー
+	std::unique_ptr<Collider> collider_;
 };

@@ -32,7 +32,7 @@ void BulletManager::Draw() {
 	}
 }
 
-void BulletManager::AddBullet(Vector3 pos) {
+void BulletManager::AddBullet(Vector3 pos, Vector3 targetPos) {
 
 	std::unique_ptr<Bullet> newBullet;
 
@@ -40,7 +40,21 @@ void BulletManager::AddBullet(Vector3 pos) {
 
 	newBullet->SetModel("Sphere");
 
-	newBullet->GetWorldTransform().SetTranslate(pos);
+	newBullet->GetWorldTransform()->SetTranslate(pos);
+
+	newBullet->SetTarget(targetPos);
 
 	bulletList_.push_back(std::move(newBullet));
+}
+
+std::list<CharacterBase*> BulletManager::GetList() {
+
+	std::list<CharacterBase*> result;
+
+	for (std::unique_ptr<Bullet>& bullet : bulletList_) {
+
+		result.push_back(bullet.get());
+	}
+
+	return result;
 }

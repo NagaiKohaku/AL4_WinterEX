@@ -10,6 +10,7 @@
 #include "string"
 #include "vector"
 #include "wrl.h"
+#include "memory"
 
 class Object3DCommon;
 
@@ -74,7 +75,7 @@ public:
 	/// ワールドトランスフォームのゲッター
 	/// </summary>
 	/// <returns>ワールドトランスフォーム</returns>
-	WorldTransform& GetWorldTransform() { return transform_; }
+	WorldTransform* GetWorldTransform() { return transform_.get(); }
 
 	///-------------------------------------------/// 
 	/// メンバ構造体
@@ -109,5 +110,5 @@ protected:
 	Model* model_;
 
 	//座標データ
-	WorldTransform transform_;
+	std::unique_ptr<WorldTransform> transform_;
 };
