@@ -5,6 +5,7 @@
 #include "BulletManager.h"
 #include "Collider.h"
 #include "Object2D.h"
+#include "Audio.h"
 
 #include "memory"
 
@@ -54,6 +55,8 @@ public:
 	///-------------------------------------------///
 public:
 
+	bool GetIsDead() { return isDead_; }
+
 	/// <summary>
 	/// バレットマネージャーのセッター
 	/// </summary>
@@ -98,6 +101,20 @@ private:
 	//タイマー
 	float time_;
 
+	float maxHP_;
+
+	float HP_;
+
 	//3Dレティクルの描画フラグ
 	bool isDrawReticle3D_;
+
+	bool isDead_;
+
+	SoundData damageSE_;
+
+	SoundData shotSE_;
+
+	SoundObject damageSEObject_[30];
+
+	SoundObject shotSEObject_[30];
 };

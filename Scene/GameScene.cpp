@@ -1,11 +1,13 @@
 #include "GameScene.h"
 
+#include "SceneManager.h"
 #include "DirectXCommon.h"
 #include "Object3DCommon.h"
 #include "Object2DCommon.h"
 #include "ModelManager.h"
 #include "SpriteManager.h"
 #include "ParticleManager.h"
+#include "Input.h"
 
 #include "imgui.h"
 
@@ -34,9 +36,13 @@ void GameScene::Initialize() {
 	ModelManager::GetInstance()->LoadModel("SkyDome", "skyDome");
 
 	//タイトル画面のスプライトをロード
-	SpriteManager::GetInstance()->LoadSprite("Sprite","RockShotTitle");
+	SpriteManager::GetInstance()->LoadSprite("GameOver", "GameOver");
+
+	SpriteManager::GetInstance()->LoadSprite("GameClear", "GameClear");
 
 	SpriteManager::GetInstance()->LoadSprite("Reticle", "Reticle");
+
+	BGM_ = Audio::GetInstance()->SoundLoad("Resource/Sound/BGM/BGM.wav");
 
 	/// === オブジェクトの生成 === ///
 
@@ -47,13 +53,6 @@ void GameScene::Initialize() {
 	/// === コライダーマネージャーの生成 === ///
 
 	colliderManager_ = std::make_unique<ColliderManager>();
-
-	//コライダー描画を有効化
-	colliderManager_->SetIsDraw(true);
-
-	/// === エネミーマネージャーの生成 === ///
-
-	enemyManager_ = std::make_unique<EnemyManager>();
 
 	/// === プレイヤーの生成 === ///
 
@@ -68,22 +67,47 @@ void GameScene::Initialize() {
 	//初期座標を設定
 	player_->GetWorldTransform()->SetTranslate({ 0.0f,0.0f,0.0f });
 
-	/// === エネミーの生成 === ///
+	/// === ボスの生成 === ///
 
-	//エネミーを1体生成
-	enemyManager_->AddEnemy({ -1.0f,-1.0f,50.0f });
+	boss_ = std::make_unique<Boss>();
+
+	boss_->SetPos({ 0.0f,0.0f,40.0f });
+
+	boss_->SetPlayer(player_.get());
+
+	boss_->SetBulletManager(bulletManager_.get());
 
 	/// === 天球の生成 === ///
 
 	skyDome_ = std::make_unique<Object3D>();
 
 	skyDome_->SetModel("SkyDome");
+
+	clearSprite_ = std::make_unique<Object2D>();
+
+	clearSprite_->SetSprite("GameClear");
+
+	clearSprite_->SetSize({ 1280.0f,720.0f });
+
+	gameOverSprite_ = std::make_unique<Object2D>();
+
+	gameOverSprite_->SetSprite("GameOver");
+
+	gameOverSprite_->SetSize({ 1280.0f,720.0f });
+
+	BGMObject_ = Audio::GetInstance()->CreateSoundObject(BGM_, true);
+
+	Audio::GetInstance()->StartSound(BGMObject_);
+
+	isClear_ = false;
+
+	isGameOver_ = false;
 }
 
 void GameScene::Finalize() {
 
 	//音声データの解放
-	Audio::GetInstance()->SoundUnLoad(&soundData_);
+	Audio::GetInstance()->SoundUnLoad(&BGM_);
 }
 
 void GameScene::Update() {
@@ -91,63 +115,56 @@ void GameScene::Update() {
 	//カメラをデバッグ状態で更新
 	camera_->Update();
 
+	GameClear();
+
+	GameOver();
+
 	/// === 3Dオブジェクトの更新 === ///
 
-	//プレイヤーの更新
-	player_->Update();
+	if (!isClear_ && !isGameOver_) {
 
-	//エネミーマネージャーの更新
-	enemyManager_->Update();
+		//プレイヤーの更新
+		player_->Update();
 
-	//バレットマネージャーの更新
-	bulletManager_->Update();
+		boss_->Update();
 
-	skyDome_->Update();
+		//バレットマネージャーの更新
+		bulletManager_->Update();
 
-	/// === 衝突判定の更新 === ///
+		skyDome_->Update();
 
-	//コライダーリストをリセット
-	colliderManager_->ResetColliderList();
+		/// === 衝突判定の更新 === ///
 
-	//プレイヤーをコライダーリストにセット
-	colliderManager_->AddColliderList(player_.get());
+		//コライダーリストをリセット
+		colliderManager_->ResetColliderList();
 
-	//エネミー情報をコライダーリストにセット
-	colliderManager_->AddColliderList(enemyManager_->GetList());
+		//プレイヤーをコライダーリストにセット
+		colliderManager_->AddColliderList(player_.get());
 
-	//バレット情報をコライダーリストにセット
-	colliderManager_->AddColliderList(bulletManager_->GetList());
+		colliderManager_->AddColliderList(boss_->GetCore());
 
-	//コライダーリストの全要素の当たり判定を取る
-	colliderManager_->CheckAllCollider();
+		colliderManager_->AddColliderList(boss_->GetPartsList());
 
-	/// === ImGuiの更新 === ///
+		//バレット情報をコライダーリストにセット
+		colliderManager_->AddColliderList(bulletManager_->GetList());
 
-	//ImGuiを起動
-	ImGui::Begin("Scene");
-
-	//モデルのImGui
-	if (ImGui::TreeNode("Player")) {
-
-		player_->DisplayImGui();
-
-		ImGui::TreePop();
+		//コライダーリストの全要素の当たり判定を取る
+		colliderManager_->CheckAllCollider();
 	}
 
-	if (ImGui::TreeNode("Camera")) {
+	clearSprite_->Update();
 
-		camera_->DisplayImGui();
+	gameOverSprite_->Update();
 
-		ImGui::TreePop();
+	if (isClear_ || isGameOver_) {
+
+		if (Input::GetInstance()->IsTriggerPushKey(DIK_SPACE)) {
+
+			Audio::GetInstance()->StopSound(BGMObject_);
+
+			sceneManager_->ChangeScene(SceneManager::SceneType::kTitle);
+		}
 	}
-
-	ImGui::Text("Shift + LeftClick : Move Camera");
-	ImGui::Text("Shift + RightClick : Rotate Camera");
-	ImGui::Text("Shift + MiddleWheel : Move Offset Camera");
-
-	//ImGuiの終了
-	ImGui::End();
-
 }
 
 void GameScene::Draw() {
@@ -170,8 +187,7 @@ void GameScene::Draw() {
 	//プレイヤーの描画
 	player_->Draw();
 
-	//エネミーマネージャーの描画
-	enemyManager_->Draw();
+	boss_->Draw();
 
 	//バレットマネージャーの描画
 	bulletManager_->Draw();
@@ -184,4 +200,32 @@ void GameScene::Draw() {
 	Object2DCommon::GetInstance()->CommonDrawSetting();
 
 	player_->Draw2D();
+
+	if (isClear_) {
+
+		clearSprite_->Draw();
+	}
+
+	if (isGameOver_) {
+
+		gameOverSprite_->Draw();
+	}
+
+}
+
+void GameScene::GameClear() {
+
+	if (boss_->GetCore()->GetIsDead()) {
+
+		isClear_ = true;
+	}
+
+}
+
+void GameScene::GameOver() {
+
+	if (player_->GetIsDead()) {
+
+		isGameOver_ = true;
+	}
 }

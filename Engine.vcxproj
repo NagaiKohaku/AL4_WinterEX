@@ -115,6 +115,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2d\TextureManager.cpp" />
     <ClCompile Include="Base\WinApp.cpp" />
     <ClCompile Include="3d\DirectionalLight.cpp" />
+    <ClCompile Include="Character\Boss.cpp" />
+    <ClCompile Include="Character\BossPart.cpp" />
+    <ClCompile Include="Character\BossCore.cpp" />
     <ClCompile Include="Character\CharacterBase.cpp" />
     <ClCompile Include="Character\Bullet.cpp" />
     <ClCompile Include="Character\BulletManager.cpp" />
@@ -141,6 +144,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Scene\SceneManager.cpp" />
     <ClCompile Include="2d\SpriteManager.cpp" />
     <ClCompile Include="3d\WorldTransform.cpp" />
+    <ClCompile Include="Scene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="2d\Sprite.h" />
@@ -160,6 +164,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2d\TextureManager.h" />
     <ClInclude Include="Base\WinApp.h" />
     <ClInclude Include="3d\DirectionalLight.h" />
+    <ClInclude Include="Character\Boss.h" />
+    <ClInclude Include="Character\BossPart.h" />
+    <ClInclude Include="Character\BossCore.h" />
     <ClInclude Include="Character\CharacterBase.h" />
     <ClInclude Include="Character\Bullet.h" />
     <ClInclude Include="Character\BulletManager.h" />
@@ -186,6 +193,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Scene\SceneManager.h" />
     <ClInclude Include="2d\SpriteManager.h" />
     <ClInclude Include="3d\WorldTransform.h" />
+    <ClInclude Include="Scene\TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resource\Shaders\Object3d.hlsli">

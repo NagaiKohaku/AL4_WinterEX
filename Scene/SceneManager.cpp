@@ -4,6 +4,7 @@
 #include "BaseScene.h"
 
 #include "GameScene.h"
+#include "TitleScene.h"
 
 ///=====================================================/// 
 /// シングルトンインスタンス
@@ -73,7 +74,7 @@ std::unique_ptr<BaseScene> SceneManager::CreateScene(SceneType sceneType) {
 	switch (sceneType) {
 		//タイトルシーン
 	case SceneType::kTitle:
-		//return std::make_unique<TitleScene>();
+		return std::make_unique<TitleScene>();
 
 		//ゲームシーン
 	case SceneType::kGame:

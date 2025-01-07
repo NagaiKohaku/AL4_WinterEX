@@ -7,8 +7,8 @@
 #include "Audio.h"
 
 #include "Player.h"
+#include "Boss.h"
 #include "BulletManager.h"
-#include "EnemyManager.h"
 #include "ColliderManager.h"
 
 #include "memory"
@@ -39,17 +39,17 @@ public:
 
 private:
 
+	void GameClear();
+
+	void GameOver();
+
+private:
+
 	//カメラ
 	std::unique_ptr<Camera> camera_;
 
-	//音声データ
-	SoundData soundData_;
-
 	//バレットマネージャー
 	std::unique_ptr<BulletManager> bulletManager_;
-
-	//エネミーマネージャー
-	std::unique_ptr<EnemyManager> enemyManager_;
 
 	//コライダーマネージャー
 	std::unique_ptr<ColliderManager> colliderManager_;
@@ -57,10 +57,24 @@ private:
 	//プレイヤー
 	std::unique_ptr<Player> player_;
 
+	//ボス
+	std::unique_ptr<Boss> boss_;
+
 	//天球
 	std::unique_ptr<Object3D> skyDome_;
 
+	std::unique_ptr<Object2D> clearSprite_;
+
+	std::unique_ptr<Object2D> gameOverSprite_;
+
+	//音声データ
+	SoundData BGM_;
+
 	//SE
-	SoundObject soundObject_;
+	SoundObject BGMObject_;
+
+	bool isClear_;
+
+	bool isGameOver_;
 
 };

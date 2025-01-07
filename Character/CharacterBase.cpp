@@ -20,8 +20,10 @@ void CharacterBase::Update() {
 	//3Dオブジェクトの更新
 	Object3D::Update();
 
+	Vector3 objectPos = transform_->GetWorldTranslate();
+
 	//キャラクターの座標とコライダーの座標を一致させる
-	collider_->GetWorldTransform()->SetTranslate(transform_->GetTranslate());
+	collider_->GetWorldTransform()->SetTranslate(objectPos);
 
 	//コライダーの更新
 	collider_->Update();

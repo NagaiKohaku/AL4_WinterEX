@@ -40,8 +40,28 @@ Player::Player() {
 	//タイマーのリセット
 	time_ = 0.0f;
 
+	maxHP_ = 5.0f;
+
+	HP_ = maxHP_;
+
 	//3Dレティクルの描画フラグをtrueで設定
 	isDrawReticle3D_ = true;
+
+	isDead_ = false;
+
+	damageSE_ = Audio::GetInstance()->SoundLoad("Resource/Sound/SE/PlayerDamage.wav");
+
+	shotSE_ = Audio::GetInstance()->SoundLoad("Resource/Sound/SE/Shot.wav");
+
+	for (int i = 0; i < 30; i++) {
+
+		damageSEObject_[i] = Audio::GetInstance()->CreateSoundObject(damageSE_, false);
+	}
+
+	for (int i = 0; i < 30; i++) {
+
+		shotSEObject_[i] = Audio::GetInstance()->CreateSoundObject(shotSE_, false);
+	}
 }
 
 ///=====================================================/// 
@@ -51,6 +71,11 @@ void Player::Update() {
 
 	//タイマーを進ませる
 	time_ += 1.0f / 60.0f;
+
+	if (HP_ <= 0.0f) {
+
+		isDead_ = true;
+	}
 
 	//移動
 	Move();
@@ -110,7 +135,28 @@ void Player::DisplayImGui() {
 /// 衝突時の処理
 ///=====================================================///
 void Player::OnCollision(CharacterBase* character) {
-	character;
+
+	if (dynamic_cast<Bullet*>(character)) {
+
+		Bullet* bullet = dynamic_cast<Bullet*>(character);
+
+		if (bullet->GetTag() == Bullet::TAG::Enemy) {
+
+			HP_--;
+
+			bullet->SetIsDead(true);
+
+			for (int i = 0; i < 30; i++) {
+
+				if (!Audio::GetInstance()->isPlayed(damageSEObject_[i])) {
+
+					Audio::GetInstance()->StartSound(damageSEObject_[i]);
+
+					break;
+				}
+			}
+		}
+	}
 }
 
 ///=====================================================/// 
@@ -159,10 +205,24 @@ void Player::Attack() {
 		if (Input::GetInstance()->isPushKey(DIK_J)) {
 
 			//バレットの追加
-			bulletManager_->AddBullet(transform_->GetTranslate(),reticle3D_->GetWorldTransform()->GetWorldTranslate());
+			bulletManager_->AddBullet(
+				transform_->GetTranslate(),
+				reticle3D_->GetWorldTransform()->GetWorldTranslate(),
+				Bullet::TAG::Player
+			);
 
 			//タイマーをリセット
 			time_ = 0.0f;
+
+			for (int i = 0; i < 30; i++) {
+
+				if (!Audio::GetInstance()->isPlayed(shotSEObject_[i])) {
+
+					Audio::GetInstance()->StartSound(shotSEObject_[i]);
+
+					break;
+				}
+			}
 		}
 	}
 

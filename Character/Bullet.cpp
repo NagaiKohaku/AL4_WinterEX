@@ -66,13 +66,7 @@ void Bullet::DisplayImGui() {
 /// 衝突時の処理
 ///=====================================================///
 void Bullet::OnCollision(CharacterBase* character) {
-
-	//衝突相手がエネミーであれば
-	if (dynamic_cast<Enemy*>(character)) {
-
-		//死亡フラグをtrueにする
-		isDead_ = true;
-	}
+	character;
 }
 
 void Bullet::SetTarget(Vector3 pos) {

@@ -15,7 +15,7 @@ public:
 
 	void Draw();
 
-	void AddBullet(Vector3 pos, Vector3 targetPos);
+	void AddBullet(Vector3 pos, Vector3 targetPos, Bullet::TAG tag);
 
 public:
 

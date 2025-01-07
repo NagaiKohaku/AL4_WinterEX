@@ -20,6 +20,11 @@ void BulletManager::Update() {
 
 	for (std::unique_ptr<Bullet>& bullet : bulletList_) {
 
+		if (bullet->GetTag() == Bullet::TAG::Enemy) {
+
+			bullet->SetSpeed(0.3f);
+		}
+
 		bullet->Update();
 	}
 }
@@ -32,7 +37,7 @@ void BulletManager::Draw() {
 	}
 }
 
-void BulletManager::AddBullet(Vector3 pos, Vector3 targetPos) {
+void BulletManager::AddBullet(Vector3 pos, Vector3 targetPos, Bullet::TAG tag) {
 
 	std::unique_ptr<Bullet> newBullet;
 
@@ -41,6 +46,8 @@ void BulletManager::AddBullet(Vector3 pos, Vector3 targetPos) {
 	newBullet->SetModel("Sphere");
 
 	newBullet->GetWorldTransform()->SetTranslate(pos);
+
+	newBullet->SetTag(tag);
 
 	newBullet->SetTarget(targetPos);
 

@@ -7,6 +7,13 @@
 ///=====================================================///
 class Bullet : public CharacterBase {
 
+public:
+
+	enum TAG {
+		Player,
+		Enemy
+	};
+
 	///-------------------------------------------/// 
 	/// メンバ関数
 	///-------------------------------------------///
@@ -49,6 +56,14 @@ public:
 	/// <returns>死亡フラグ</returns>
 	bool GetIsDead() { return isDead_; }
 
+	TAG GetTag() { return tag_; }
+
+	void SetIsDead(bool flag) { isDead_ = flag; }
+
+	void SetTag(TAG tag) { tag_ = tag; }
+
+	void SetSpeed(float speed) { speed_ = speed; }
+
 	/// <summary>
 	/// 攻撃目標のセッター
 	/// </summary>
@@ -67,6 +82,8 @@ private:
 	/// メンバ変数
 	///-------------------------------------------///
 private:
+
+	TAG tag_;
 
 	//移動速度
 	float speed_;
