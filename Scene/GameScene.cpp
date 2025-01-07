@@ -1,11 +1,13 @@
 #include "GameScene.h"
 
+#include "SceneManager.h"
 #include "DirectXCommon.h"
 #include "Object3DCommon.h"
 #include "Object2DCommon.h"
 #include "ModelManager.h"
 #include "SpriteManager.h"
 #include "ParticleManager.h"
+#include "Input.h"
 
 #include "imgui.h"
 
@@ -21,85 +23,91 @@ void GameScene::Initialize() {
 	camera_->SetDebugCameraFlag(true);
 
 	//カメラの座標
-	camera_->GetWorldTransform().SetTranslate({ 0.0f,3.0f,0.0f });
+	camera_->GetWorldTransform().SetTranslate({ 0.0f,0.0f,-5.0f });
 
-	//デフォルトカメラを設定
+	//3Dオブジェクト基底のデフォルトカメラを設定
 	Object3DCommon::GetInstance()->SetDefaultCamera(camera_.get());
 
+	//パーティく売るマネージャーのデフォルトカメラを設定
 	ParticleManager::GetInstance()->SetDefaultCamera(camera_.get());
 
 	/// === リソースの読み込み === ///
 
-	//スプライトのロード
-	SpriteManager::GetInstance()->LoadSprite("Title", "RockShotTitle");
+	ModelManager::GetInstance()->LoadModel("SkyDome", "skyDome");
 
-	//モデルのロード
-	ModelManager::GetInstance()->LoadModel("Ground", "terrain");
+	//タイトル画面のスプライトをロード
+	SpriteManager::GetInstance()->LoadSprite("GameOver", "GameOver");
 
-	//音声データの読み込み
-	soundData_ = Audio::GetInstance()->SoundLoad("Resource/Sound/SE/se.wav");
+	SpriteManager::GetInstance()->LoadSprite("GameClear", "GameClear");
+
+	SpriteManager::GetInstance()->LoadSprite("Reticle", "Reticle");
+
+	BGM_ = Audio::GetInstance()->SoundLoad("Resource/Sound/BGM/BGM.wav");
 
 	/// === オブジェクトの生成 === ///
 
-	/// === タイトルの生成 === ///
+	/// === バレットマネージャーの生成 === ///
 
-	/// === 箱の生成 === ///
+	bulletManager_ = std::make_unique<BulletManager>();
 
-	//箱の生成
-	cube_ = std::make_unique<Object3D>();
+	/// === コライダーマネージャーの生成 === ///
 
-	//座標の設定
-	cube_->GetWorldTransform().SetTranslate({ 0.0f,1.0f,0.0f });
+	colliderManager_ = std::make_unique<ColliderManager>();
 
-	//モデルの設定
-	cube_->SetModel("Cube");
+	/// === プレイヤーの生成 === ///
 
-	//モデルの色を指定
-	cube_->GetModel()->SetColor({ 0.5f,0.0f,0.0f,1.0f });
+	player_ = std::make_unique<Player>();
 
-	/// === 球の生成 === ///
+	//モデルを設定
+	player_->SetModel("Sphere");
 
-	//球の生成
-	ball_ = std::make_unique<Object3D>();
+	//バレットマネージャーの設定
+	player_->SetBulletManager(bulletManager_.get());
 
-	//座標の設定
-	ball_->GetWorldTransform().SetTranslate({ 0.0f,3.0f,0.0f });
+	//初期座標を設定
+	player_->GetWorldTransform()->SetTranslate({ 0.0f,0.0f,0.0f });
 
-	//角度の設定
-	ball_->GetWorldTransform().SetRotate({ 0.0f,static_cast<float>(std::numbers::pi) / 180.0f * -90.0f,0.0f });
+	/// === ボスの生成 === ///
 
-	//モデルの設定
-	ball_->SetModel("Sphere");
+	boss_ = std::make_unique<Boss>();
 
-	//モデルの色の指定
-	ball_->GetModel()->SetColor({ 0.5f,0.f,0.0f,1.0f });
+	boss_->SetPos({ 0.0f,0.0f,40.0f });
 
-	camera_->SetTrackingObject(ball_.get());
+	boss_->SetPlayer(player_.get());
 
-	/// === 地面の生成 === ///
+	boss_->SetBulletManager(bulletManager_.get());
 
-	//地面の生成
-	ground_ = std::make_unique<Object3D>();
+	/// === 天球の生成 === ///
 
-	//角度の設定
-	ground_->GetWorldTransform().SetRotate({ 0.0f,static_cast<float>(std::numbers::pi) / 180.0f * -90.0f,0.0f });
+	skyDome_ = std::make_unique<Object3D>();
 
-	//モデルの設定
-	ground_->SetModel("Ground");
+	skyDome_->SetModel("SkyDome");
 
-	/// === SEの生成 === ///
+	clearSprite_ = std::make_unique<Object2D>();
 
-	soundObject_ = Audio::GetInstance()->CreateSoundObject(soundData_, false);
+	clearSprite_->SetSprite("GameClear");
 
-	ParticleManager::GetInstance()->CreateParticleGroup("Particle", "star.png");
+	clearSprite_->SetSize({ 1280.0f,720.0f });
 
-	ParticleManager::GetInstance()->SetAcceleration("Particle", Vector3(0.0f, 5.0f, 0.0f), AABB({ -1.0f,-1.0f,-1.0f }, { 1.0f,1.0f,1.0f }));
+	gameOverSprite_ = std::make_unique<Object2D>();
+
+	gameOverSprite_->SetSprite("GameOver");
+
+	gameOverSprite_->SetSize({ 1280.0f,720.0f });
+
+	BGMObject_ = Audio::GetInstance()->CreateSoundObject(BGM_, true);
+
+	Audio::GetInstance()->StartSound(BGMObject_);
+
+	isClear_ = false;
+
+	isGameOver_ = false;
 }
 
 void GameScene::Finalize() {
 
 	//音声データの解放
-	Audio::GetInstance()->SoundUnLoad(&soundData_);
+	Audio::GetInstance()->SoundUnLoad(&BGM_);
 }
 
 void GameScene::Update() {
@@ -107,63 +115,56 @@ void GameScene::Update() {
 	//カメラをデバッグ状態で更新
 	camera_->Update();
 
-	//3Dオブジェクトの更新
-	cube_->Update();
+	GameClear();
 
-	ball_->Update();
+	GameOver();
 
-	ground_->Update();
+	/// === 3Dオブジェクトの更新 === ///
 
-	ParticleManager::GetInstance()->Emit(
-		"Particle",
-		Vector3(0.0f, 0.0f, 0.0f),
-		AABB({ -1.0f,0.0f,-1.0f }, { 1.0f,0.0f,1.0f }),
-		Vector3(-1.0f, -2.0f, -1.0f),
-		Vector3(1.0f, -1.0f, 1.0f),
-		1.0f,
-		3.0f,
-		true,
-		2
-	);
+	if (!isClear_ && !isGameOver_) {
 
-	//ImGuiを起動
-	ImGui::Begin("Scene");
+		//プレイヤーの更新
+		player_->Update();
 
-	//モデルのImGui
-	if (ImGui::TreeNode("Cube")) {
+		boss_->Update();
 
-		cube_->DisplayImGui();
+		//バレットマネージャーの更新
+		bulletManager_->Update();
 
-		ImGui::TreePop();
+		skyDome_->Update();
+
+		/// === 衝突判定の更新 === ///
+
+		//コライダーリストをリセット
+		colliderManager_->ResetColliderList();
+
+		//プレイヤーをコライダーリストにセット
+		colliderManager_->AddColliderList(player_.get());
+
+		colliderManager_->AddColliderList(boss_->GetCore());
+
+		colliderManager_->AddColliderList(boss_->GetPartsList());
+
+		//バレット情報をコライダーリストにセット
+		colliderManager_->AddColliderList(bulletManager_->GetList());
+
+		//コライダーリストの全要素の当たり判定を取る
+		colliderManager_->CheckAllCollider();
 	}
 
-	if (ImGui::TreeNode("Ball")) {
+	clearSprite_->Update();
 
-		ball_->DisplayImGui();
+	gameOverSprite_->Update();
 
-		ImGui::TreePop();
+	if (isClear_ || isGameOver_) {
+
+		if (Input::GetInstance()->IsTriggerPushKey(DIK_SPACE)) {
+
+			Audio::GetInstance()->StopSound(BGMObject_);
+
+			sceneManager_->ChangeScene(SceneManager::SceneType::kTitle);
+		}
 	}
-
-	if (ImGui::TreeNode("Camera")) {
-
-		camera_->DisplayImGui();
-
-		ImGui::TreePop();
-	}
-
-	if (ImGui::Button("Start Audio")) {
-
-		//音声データの再生
-		Audio::GetInstance()->StartSound(soundObject_);
-	}
-
-	ImGui::Text("Shift + LeftClick : Move Camera");
-	ImGui::Text("Shift + RightClick : Rotate Camera");
-	ImGui::Text("Shift + MiddleWheel : Move Offset Camera");
-
-	//ImGuiの終了
-	ImGui::End();
-
 }
 
 void GameScene::Draw() {
@@ -181,15 +182,50 @@ void GameScene::Draw() {
 	//3DObjectの描画準備
 	Object3DCommon::GetInstance()->CommonDrawSetting();
 
-	////Object3Dの描画
-	cube_->Draw();
+	skyDome_->Draw();
 
-	ball_->Draw();
+	//プレイヤーの描画
+	player_->Draw();
 
-	ground_->Draw();
+	boss_->Draw();
+
+	//バレットマネージャーの描画
+	bulletManager_->Draw();
+
+	//コライダーマネージャーの描画
+	colliderManager_->Draw();
 
 	/// === 前景Spriteの描画 === ///
 
 	Object2DCommon::GetInstance()->CommonDrawSetting();
 
+	player_->Draw2D();
+
+	if (isClear_) {
+
+		clearSprite_->Draw();
+	}
+
+	if (isGameOver_) {
+
+		gameOverSprite_->Draw();
+	}
+
+}
+
+void GameScene::GameClear() {
+
+	if (boss_->GetCore()->GetIsDead()) {
+
+		isClear_ = true;
+	}
+
+}
+
+void GameScene::GameOver() {
+
+	if (player_->GetIsDead()) {
+
+		isGameOver_ = true;
+	}
 }

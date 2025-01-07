@@ -33,7 +33,9 @@ Object3D::Object3D() {
 	WVPData_->World = MakeIdentity4x4();
 	WVPData_->WorldInverseTranspose = MakeIdentity4x4();
 
-	transform_.Initialize();
+	transform_ = std::make_unique<WorldTransform>();
+
+	transform_->Initialize();
 
 	//今持っているカメラをデフォルトカメラに設定
 	camera_ = object3DCommon_->GetDefaultCamera();
@@ -44,10 +46,10 @@ Object3D::Object3D() {
 ///=====================================================///
 void Object3D::Update() {
 
-	transform_.UpdateMatrix();
+	transform_->UpdateMatrix();
 
 	//ワールドビュープロジェクション行列
-	Matrix4x4 worldViewProjectionMatrix = transform_.GetWorldMatrix();
+	Matrix4x4 worldViewProjectionMatrix = transform_->GetWorldMatrix();
 
 	if (camera_) {
 
@@ -62,8 +64,8 @@ void Object3D::Update() {
 
 	//座標変換行列データの設定
 	WVPData_->WVP = worldViewProjectionMatrix;
-	WVPData_->World = transform_.GetWorldMatrix();
-	WVPData_->WorldInverseTranspose = Inverse4x4(transform_.GetWorldMatrix());
+	WVPData_->World = transform_->GetWorldMatrix();
+	WVPData_->WorldInverseTranspose = Inverse4x4(transform_->GetWorldMatrix());
 }
 
 ///=====================================================/// 
@@ -89,7 +91,7 @@ void Object3D::DisplayImGui() {
 
 	float shininess = model_->GetShininess();
 
-	transform_.DisplayImGui();
+	transform_->DisplayImGui();
 
 	ImGui::ColorEdit3("Color", &color.x);
 	ImGui::DragFloat("Shininess", &shininess, 0.1f);

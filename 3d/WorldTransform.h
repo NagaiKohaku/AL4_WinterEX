@@ -57,6 +57,12 @@ public:
 	const Matrix4x4& GetWorldMatrix() const { return worldMatrix_; }
 
 	/// <summary>
+	/// 移動量のゲッター
+	/// </summary>
+	/// <returns>移動量</returns>
+	const Vector3& GetVelocity() const { return velocity_; }
+
+	/// <summary>
 	/// 座標のセッター
 	/// </summary>
 	/// <param name="vector">座標</param>
@@ -73,6 +79,12 @@ public:
 	/// </summary>
 	/// <param name="vector">大きさ</param>
 	void SetScale(const Vector3& vector) { scale_ = vector; }
+
+	/// <summary>
+	/// 移動量のセッター
+	/// </summary>
+	/// <param name="vector">移動慮</param>
+	void SetVelocity(const Vector3& vector) { velocity_ = vector; }
 
 	/// <summary>
 	/// ワールド行列のセッター
@@ -96,7 +108,13 @@ public:
 	/// 親オブジェクトのセッター
 	/// </summary>
 	/// <param name="parent"></param>
-	void SetParent(const WorldTransform* parent);
+	void SetParent(WorldTransform* parent);
+
+	/// <summary>
+	/// 移動量の加算
+	/// </summary>
+	/// <param name="vector">移動量</param>
+	void AddVelocity(const Vector3& vector) { velocity_ += vector; }
 
 private:
 
@@ -108,6 +126,9 @@ private:
 
 	//大きさ
 	Vector3 scale_;
+
+	//移動量
+	Vector3 velocity_;
 
 	//ワールド行列
 	Matrix4x4 worldMatrix_;

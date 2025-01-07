@@ -10,6 +10,7 @@
 #include "string"
 #include "vector"
 #include "wrl.h"
+#include "memory"
 
 class Object3DCommon;
 
@@ -35,17 +36,17 @@ public:
 	/// <summary>
 	/// 更新処理
 	/// </summary>
-	void Update();
+	virtual void Update();
 
 	/// <summary>
 	/// 描画処理
 	/// </summary>
-	void Draw();
+	virtual void Draw();
 
 	/// <summary>
 	/// ImGuiの表示
 	/// </summary>
-	void DisplayImGui();
+	virtual void DisplayImGui();
 
 	///-------------------------------------------/// 
 	/// ゲッター・セッター
@@ -74,12 +75,12 @@ public:
 	/// ワールドトランスフォームのゲッター
 	/// </summary>
 	/// <returns>ワールドトランスフォーム</returns>
-	WorldTransform& GetWorldTransform() { return transform_; }
+	WorldTransform* GetWorldTransform() { return transform_.get(); }
 
 	///-------------------------------------------/// 
 	/// メンバ構造体
 	///-------------------------------------------///
-private:
+protected:
 
 	//座標変換行列データ
 	struct TransformationMatrix {
@@ -91,7 +92,7 @@ private:
 	///-------------------------------------------/// 
 	/// メンバ変数
 	///-------------------------------------------///
-private:
+protected:
 
 	//3Dオブジェクト基底
 	Object3DCommon* object3DCommon_;
@@ -109,5 +110,5 @@ private:
 	Model* model_;
 
 	//座標データ
-	WorldTransform transform_;
+	std::unique_ptr<WorldTransform> transform_;
 };
