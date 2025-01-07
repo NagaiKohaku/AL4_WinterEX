@@ -35,12 +35,18 @@ void GameScene::Initialize() {
 
 	ModelManager::GetInstance()->LoadModel("SkyDome", "skyDome");
 
+	ModelManager::GetInstance()->LoadModel("BossCore", "Sphere");
+
+	ModelManager::GetInstance()->FindModel("BossCore")->SetColor({ 1.0f,0.0f,0.0f,1.0f });
+
 	//タイトル画面のスプライトをロード
 	SpriteManager::GetInstance()->LoadSprite("GameOver", "GameOver");
 
 	SpriteManager::GetInstance()->LoadSprite("GameClear", "GameClear");
 
 	SpriteManager::GetInstance()->LoadSprite("Reticle", "Reticle");
+
+	SpriteManager::GetInstance()->LoadSprite("Tutorial", "Tutorial");
 
 	BGM_ = Audio::GetInstance()->SoundLoad("Resource/Sound/BGM/BGM.wav");
 
@@ -94,6 +100,12 @@ void GameScene::Initialize() {
 	gameOverSprite_->SetSprite("GameOver");
 
 	gameOverSprite_->SetSize({ 1280.0f,720.0f });
+
+	tutorialSprite_ = std::make_unique<Object2D>();
+
+	tutorialSprite_->SetSprite("Tutorial");
+
+	tutorialSprite_->SetSize({ 1280.0f,720.0f });
 
 	BGMObject_ = Audio::GetInstance()->CreateSoundObject(BGM_, true);
 
@@ -156,6 +168,8 @@ void GameScene::Update() {
 
 	gameOverSprite_->Update();
 
+	tutorialSprite_->Update();
+
 	if (isClear_ || isGameOver_) {
 
 		if (Input::GetInstance()->IsTriggerPushKey(DIK_SPACE)) {
@@ -200,6 +214,8 @@ void GameScene::Draw() {
 	Object2DCommon::GetInstance()->CommonDrawSetting();
 
 	player_->Draw2D();
+
+	tutorialSprite_->Draw();
 
 	if (isClear_) {
 

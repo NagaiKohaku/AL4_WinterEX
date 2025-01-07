@@ -98,6 +98,12 @@ public:
 	/// <param name="vector">オフセット</param>
 	void SetOffset(const Vector3& vector) { offset_ = vector; }
 
+	void SetIsClamp(bool flag) { isClamp_ = flag; }
+
+	void SetMax(Vector3 pos) { max_ = pos; }
+
+	void SetMin(Vector3 pos) { min_ = pos; }
+
 	/// <summary>
 	/// ワールド座標のゲッター
 	/// </summary>
@@ -138,4 +144,10 @@ private:
 
 	//親オブジェクト
 	WorldTransform* parent_;
+
+	bool isClamp_;
+
+	Vector3 max_;
+
+	Vector3 min_;
 };
