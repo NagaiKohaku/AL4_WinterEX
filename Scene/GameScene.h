@@ -67,6 +67,8 @@ private:
 
 	std::unique_ptr<Object2D> gameOverSprite_;
 
+	std::unique_ptr<Object2D> tutorialSprite_;
+
 	//音声データ
 	SoundData BGM_;
 

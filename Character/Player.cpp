@@ -62,6 +62,12 @@ Player::Player() {
 
 		shotSEObject_[i] = Audio::GetInstance()->CreateSoundObject(shotSE_, false);
 	}
+
+	transform_->SetIsClamp(true);
+
+	transform_->SetMax({ 6.5f,3.0f,0.0f });
+
+	transform_->SetMin({ -6.5f,-3.0f,0.0f });
 }
 
 ///=====================================================/// 

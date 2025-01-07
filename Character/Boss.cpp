@@ -4,7 +4,7 @@ Boss::Boss() {
 
 	core_ = std::make_unique<BossCore>();
 
-	core_->SetModel("Sphere");
+	core_->SetModel("BossCore");
 
 	for (int i = 0; i < 4; i++) {
 

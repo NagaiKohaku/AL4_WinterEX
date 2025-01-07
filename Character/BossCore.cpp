@@ -33,10 +33,14 @@ void BossCore::Update() {
 
 void BossCore::Draw() {
 
-	if (!isDead_) {
+	if (!isInvincible_) {
 
-		CharacterBase::Draw();
+		if (!isDead_) {
+
+			CharacterBase::Draw();
+		}
 	}
+
 }
 
 void BossCore::DisplayImGui() {

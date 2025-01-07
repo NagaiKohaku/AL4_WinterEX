@@ -4,6 +4,8 @@
 
 #include "imgui.h"
 
+#include "algorithm"
+
 void WorldTransform::Initialize() {
 
 	translate_ = { 0.0f,0.0f,0.0f };
@@ -14,12 +16,26 @@ void WorldTransform::Initialize() {
 
 	offset_ = { 0.0f,0.0f,0.0f };
 
+	isClamp_ = false;
+
+	max_ = { 0.0f,0.0f,0.0f };
+	min_ = { 0.0f,0.0f,0.0f };
+
 	UpdateMatrix();
 }
 
 void WorldTransform::UpdateMatrix() {
 
 	translate_ += velocity_;
+
+	if (isClamp_) {
+
+		translate_ = {
+			std::clamp(translate_.x,min_.x,max_.x),
+			std::clamp(translate_.y,min_.y,max_.y),
+			std::clamp(translate_.z,min_.z,max_.z)
+		};
+	}
 
 	worldMatrix_ = MakeAffineMatrix(scale_, rotate_, translate_ + offset_);
 
